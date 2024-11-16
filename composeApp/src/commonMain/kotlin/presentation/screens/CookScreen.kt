@@ -3,6 +3,8 @@ package presentation.screens
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,10 +34,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
@@ -46,10 +50,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import coil3.compose.AsyncImage
+import navigation.cook.CookComponent
 import noshtask.composeapp.generated.resources.Res
 import noshtask.composeapp.generated.resources.compose_multiplatform
 import noshtask.composeapp.generated.resources.cook_image
 import noshtask.composeapp.generated.resources.devices
+import noshtask.composeapp.generated.resources.explore_image
 import noshtask.composeapp.generated.resources.favorite
 import noshtask.composeapp.generated.resources.img
 import noshtask.composeapp.generated.resources.logout
@@ -67,11 +73,13 @@ import presentation.viewModel.CookViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CookScreen() {
+fun CookScreen(component: CookComponent) {
 
 
     var search by remember { mutableStateOf("") }
     var itemList: List<JsonResponseItem>? = null
+    val coroutineScope = rememberCoroutineScope()
+    var showBottomSheet by remember { mutableStateOf(false) }
 
     var response: JsonResponse? = null
 
@@ -103,130 +111,130 @@ fun CookScreen() {
     }
 
     Scaffold(
-        bottomBar = {
-            BottomAppBar(
-                //containerColor = Color.White,
-                modifier = Modifier,
-                contentColor = Color.White,
-                backgroundColor = Color.White,
-                contentPadding = PaddingValues(0.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround
-                ) {
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Image(
-                            painter = painterResource(Res.drawable.cook_image),
-                            contentDescription = null,
-                            modifier = Modifier.size(30.dp)
-                                .clip(CircleShape)
-                        )
-                        Text(
-                            modifier = Modifier,
-                            textAlign = TextAlign.Center,
-                            text = "Cook",
-                            fontSize = 14.sp,
-                            color = Color.Blue
-                        )
-                    }
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Image(
-                            painter = painterResource(Res.drawable.favorite),
-                            contentDescription = null,
-                            modifier = Modifier.size(30.dp)
-                                .clip(CircleShape)
-                        )
-                        Text(
-                            modifier = Modifier,
-                            textAlign = TextAlign.Center,
-                            text = "Favourites",
-                            fontSize = 14.sp,
-                            color = Color.Blue
-                        )
-                    }
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Image(
-                            painter = painterResource(Res.drawable.img),
-                            contentDescription = null,
-                            modifier = Modifier.size(30.dp)
-                                .clip(CircleShape)
-                        )
-                        Text(
-                            modifier = Modifier,
-                            textAlign = TextAlign.Center,
-                            text = "Manual",
-                            fontSize = 14.sp,
-                            color = Color.Blue
-                        )
-                    }
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Image(
-                            painter = painterResource(Res.drawable.devices),
-                            contentDescription = null,
-                            modifier = Modifier.size(30.dp)
-                                .clip(CircleShape)
-                        )
-                        Text(
-                            modifier = Modifier,
-                            textAlign = TextAlign.Center,
-                            text = "Device",
-                            fontSize = 14.sp,
-                            color = Color.Blue
-                        )
-                    }
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Image(
-                            painter = painterResource(Res.drawable.pref),
-                            contentDescription = null,
-                            modifier = Modifier.size(30.dp)
-                                .clip(CircleShape)
-                        )
-                        Text(
-                            modifier = Modifier,
-                            textAlign = TextAlign.Center,
-                            text = "Preferences",
-                            fontSize = 14.sp,
-                            color = Color.Blue
-                        )
-                    }
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Image(
-                            painter = painterResource(Res.drawable.setting),
-                            contentDescription = null,
-                            modifier = Modifier.size(30.dp)
-                                .clip(CircleShape)
-                        )
-                        Text(
-                            modifier = Modifier,
-                            textAlign = TextAlign.Center,
-                            text = "Settings",
-                            fontSize = 14.sp,
-                            color = Color.Blue
-                        )
-                    }
+        /* bottomBar = {
+             BottomAppBar(
+                 //containerColor = Color.White,
+                 modifier = Modifier,
+                 contentColor = Color.White,
+                 backgroundColor = Color.White,
+                 contentPadding = PaddingValues(0.dp)
+             ) {
+                 Row(
+                     modifier = Modifier.fillMaxWidth(),
+                     horizontalArrangement = Arrangement.SpaceAround
+                 ) {
+                     Column(
+                         verticalArrangement = Arrangement.Center,
+                         horizontalAlignment = Alignment.CenterHorizontally
+                     ) {
+                         Image(
+                             painter = painterResource(Res.drawable.cook_image),
+                             contentDescription = null,
+                             modifier = Modifier.size(30.dp)
+                                 .clip(CircleShape)
+                         )
+                         Text(
+                             modifier = Modifier,
+                             textAlign = TextAlign.Center,
+                             text = "Cook",
+                             fontSize = 14.sp,
+                             color = Color.Blue
+                         )
+                     }
+                     Column(
+                         verticalArrangement = Arrangement.Center,
+                         horizontalAlignment = Alignment.CenterHorizontally
+                     ) {
+                         Image(
+                             painter = painterResource(Res.drawable.favorite),
+                             contentDescription = null,
+                             modifier = Modifier.size(30.dp)
+                                 .clip(CircleShape)
+                         )
+                         Text(
+                             modifier = Modifier,
+                             textAlign = TextAlign.Center,
+                             text = "Favourites",
+                             fontSize = 14.sp,
+                             color = Color.Blue
+                         )
+                     }
+                     Column(
+                         verticalArrangement = Arrangement.Center,
+                         horizontalAlignment = Alignment.CenterHorizontally
+                     ) {
+                         Image(
+                             painter = painterResource(Res.drawable.img),
+                             contentDescription = null,
+                             modifier = Modifier.size(30.dp)
+                                 .clip(CircleShape)
+                         )
+                         Text(
+                             modifier = Modifier,
+                             textAlign = TextAlign.Center,
+                             text = "Manual",
+                             fontSize = 14.sp,
+                             color = Color.Blue
+                         )
+                     }
+                     Column(
+                         verticalArrangement = Arrangement.Center,
+                         horizontalAlignment = Alignment.CenterHorizontally
+                     ) {
+                         Image(
+                             painter = painterResource(Res.drawable.devices),
+                             contentDescription = null,
+                             modifier = Modifier.size(30.dp)
+                                 .clip(CircleShape)
+                         )
+                         Text(
+                             modifier = Modifier,
+                             textAlign = TextAlign.Center,
+                             text = "Device",
+                             fontSize = 14.sp,
+                             color = Color.Blue
+                         )
+                     }
+                     Column(
+                         verticalArrangement = Arrangement.Center,
+                         horizontalAlignment = Alignment.CenterHorizontally
+                     ) {
+                         Image(
+                             painter = painterResource(Res.drawable.pref),
+                             contentDescription = null,
+                             modifier = Modifier.size(30.dp)
+                                 .clip(CircleShape)
+                         )
+                         Text(
+                             modifier = Modifier,
+                             textAlign = TextAlign.Center,
+                             text = "Preferences",
+                             fontSize = 14.sp,
+                             color = Color.Blue
+                         )
+                     }
+                     Column(
+                         verticalArrangement = Arrangement.Center,
+                         horizontalAlignment = Alignment.CenterHorizontally
+                     ) {
+                         Image(
+                             painter = painterResource(Res.drawable.setting),
+                             contentDescription = null,
+                             modifier = Modifier.size(30.dp)
+                                 .clip(CircleShape)
+                         )
+                         Text(
+                             modifier = Modifier,
+                             textAlign = TextAlign.Center,
+                             text = "Settings",
+                             fontSize = 14.sp,
+                             color = Color.Blue
+                         )
+                     }
 
-                }
-            }
-        }
+                 }
+             }
+         }*/
     ) {
 
         LazyColumn(
@@ -276,29 +284,34 @@ fun CookScreen() {
             item {
                 Card(
                     modifier = Modifier,
-                    shape = RoundedCornerShape(20.dp),
+                    shape = RoundedCornerShape(28.dp),
                     backgroundColor = Color.DarkGray,
                     elevation = 8.dp,
-                )
-                {
+                ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Start,
-                        modifier = Modifier.padding(3.dp)
+                        modifier = Modifier//.padding(3.dp)
                     ) {
                         Box(
                             modifier = Modifier
-                                .background(Color(0xFFAC94F4))
-                                .clip(CircleShape)
-                            ,
+                                .background(Color(0xFFAC94F4), shape = CircleShape)
+                                .shadow(
+                                    elevation = 16.dp,
+                                    shape = CircleShape,
+                                    ambientColor = Color(0xFFAC94F4),
+                                    spotColor = Color(0xFFAC94F4)
+                                )
                         ) {
                             Image(
                                 painter = painterResource(Res.drawable.pasta),
                                 contentDescription = null,
                                 contentScale = ContentScale.FillBounds,
-                                modifier = Modifier.size(50.dp)
-                                .clip(CircleShape)
-                                .padding(8.dp)
+                                modifier = Modifier
+                                    .size(54.dp)
+                                    .clip(CircleShape)
+                                    .padding(4.dp)
+                                    .clip(CircleShape)
                             )
                         }
                         Spacer(Modifier.padding(2.dp))
@@ -422,20 +435,26 @@ fun CookScreen() {
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
                     // verticalAlignment = Alignment.,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(
                         items = itemList.orEmpty()
                     ) {
                         Card(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth()
+                                //.clip(shape = RoundedCornerShape(20.dp))
+                                .clickable {
+                                    showBottomSheet = true
+                                }
+                                .border(0.4.dp, Color.LightGray,RoundedCornerShape(20.dp)),
                             shape = RoundedCornerShape(20.dp),
                             backgroundColor = Color.White,//Color(0xF8855C),
                             elevation = 4.dp,
                         ) {
 
                             Column(
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Box(
                                     modifier = Modifier
@@ -498,9 +517,10 @@ fun CookScreen() {
                                 Spacer(Modifier.padding(4.dp))
                                 Text(
                                     modifier = Modifier
-                                        .fillMaxWidth(),
+                                        .fillMaxWidth()
+                                        .padding(4.dp),
                                     textAlign = TextAlign.Center,
-                                    text = "Italian Spaghetti Pasta",
+                                    text = "Italian Spaghetti\nPasta",
                                     fontSize = 18.sp,
                                     style = TextStyle(
                                         color = Color.Blue,
@@ -527,7 +547,7 @@ fun CookScreen() {
                                             modifier = Modifier
                                                 .fillMaxWidth(),
                                             //   textAlign = TextAlign.Start,
-                                            text = "30 min",
+                                            text = "30 min ",
                                             fontSize = 11.sp
                                         )
                                     }
@@ -536,7 +556,7 @@ fun CookScreen() {
                                         modifier = Modifier
                                             .fillMaxWidth(),
                                         //  textAlign = TextAlign.Start,
-                                        text = " ● Medium prep",
+                                        text = " ●  Medium prep",
                                         fontSize = 11.sp
                                     )
                                 }
@@ -548,41 +568,58 @@ fun CookScreen() {
             }
             //explore
             item {
-                Row(
+                Column (
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Card(
                         modifier = Modifier,
                         /*.width(69.dp)
                                 .height(36.dp)*/
                         elevation = 0.dp,
-                        shape = RoundedCornerShape(16.dp),
+                        shape = RoundedCornerShape(24.dp),
                         backgroundColor = Color(0xFFFC9706),
                     ) {
-                        Text(
-                            modifier = Modifier.padding(8.dp),
-                            //  .fillMaxWidth(),
-                            textAlign = TextAlign.Center,
-                            text = "Explore all dishes",
-                            fontSize = 18.sp,
-                            style = TextStyle(
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Start,
+                            modifier = Modifier
+                        ) {
+                            Text(
+                                modifier = Modifier.padding(8.dp),
+                                //  .fillMaxWidth(),
+                                textAlign = TextAlign.Center,
+                                text = "Explore all dishes",
+                                fontSize = 18.sp,
+                                style = TextStyle(
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold
+                                )
                             )
-                        )
+
+                            Image(
+                                painter = painterResource(Res.drawable.explore_image),
+                                contentDescription = null,
+                                contentScale = ContentScale.FillBounds,
+                                modifier = Modifier
+                                    .height(54.dp)
+                                    .clip(CircleShape)
+                            )
+                        }
                     }
 
                     Card(
-                        modifier = Modifier,
+                        modifier = Modifier.fillMaxWidth(),
                         /*.width(69.dp)
                                 .height(36.dp)*/
                         elevation = 0.dp,
-                        shape = RoundedCornerShape(16.dp),
+                        shape = RoundedCornerShape(24.dp),
                         backgroundColor = Color(0xFFFC9706),
                     ) {
                         Text(
-                            modifier = Modifier.padding(8.dp),
+                            modifier = Modifier
+                                .padding(14.dp),
                             //  .fillMaxWidth(),
                             textAlign = TextAlign.Center,
                             text = "Confused what to cook?",
@@ -596,7 +633,19 @@ fun CookScreen() {
                 }
 
             }
+            item {
+                Spacer(Modifier.padding(36.dp))
+            }
 
+        }
+
+        if (showBottomSheet) {
+            ScheduleCookingTimeDialog(
+                onCookNow = {showBottomSheet = false},
+                onDelete = {showBottomSheet = false},
+                onDismiss = {showBottomSheet = false},
+                onReschedule = { showBottomSheet = false }
+            )
         }
     }
 
